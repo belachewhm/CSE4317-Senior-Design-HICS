@@ -1,0 +1,662 @@
+﻿@using Core
+@using Web.Helpers
+@model Web.Models.DashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+    var cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+    var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
+}
+@*<link href="~/Content/select2.css" rel="stylesheet" />*@
+@*<link href="~/Content/bootstrap-switch.min.css" rel="stylesheet" />*@
+<link href="~/Content/weather-icons/css/weather-icons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+@*<script src="~/Scripts/bootstrap-switch.min.js"></script>*@
+@*<link href="~/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>*@
+
+<style>
+    .widget.widget-stats {
+        position: relative;
+    }
+
+    .widget {
+        border-radius: 3px;
+        margin-bottom: 20px;
+        color: #fff;
+        padding: 15px;
+        overflow: hidden;
+    }
+
+    .bg-green {
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+    }
+    .widget-stats .stats-desc, .widget-stats .stats-title {
+        color: #fff;
+        color: rgba(255,255,255,.6);
+    }
+
+    .widget-stats .stats-title {
+        position: relative;
+        line-height: 1.1;
+        font-size: 12px;
+        margin: 2px 0 7px;
+    }
+
+    .widget-stats .stats-number {
+        font-size: 24px;
+        font-weight: 300;
+        margin-bottom: 10px;
+    }
+    .widget-stats .stats-icon.stats-icon-lg {
+        font-size: 52px;
+        top: 12px;
+        right: 21px;
+    }
+
+    .widget-stats .stats-desc {
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+
+    .datepicker{z-index:1151 !important;}
+
+    .widget-stats .stats-desc, .widget-stats .stats-title {
+        color: #fff;
+        color: rgba(255,255,255,.6);
+    }
+
+    .widget-stats .stats-info h4 {
+        font-size: 12px;
+        margin: 5px 0;
+        color: #fff;
+    }
+
+    .widget-stats .stats-info p {
+        font-size: 24px;
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+
+    .widget-stats .stats-link a {
+        display: block;
+        margin: 15px -15px -15px;
+        padding: 7px 15px;
+        background: url(../img/transparent/black-0.4.png);
+        background: rgba(0,0,0,.4);
+        text-align: right;
+        color: #ddd;
+        font-weight: 300;
+        text-decoration: none;
+    }
+
+    .widget-stats .stats-icon {
+        font-size: 42px;
+        height: 56px;
+        width: 56px;
+        text-align: center;
+        line-height: 56px;
+        margin-left: 15px;
+        color: #fff;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        opacity: .2;
+        filter: alpha(opacity=20);
+    }
+
+    .circle {
+        border-radius: 50%;
+        width: 200px;
+        height: 200px;
+        /* width and height can be anything, as long as they're equal */
+    }
+
+    .weekday-col .col-md-1,
+    .weekday-col .col-sm-1,
+    .weekday-col .col-lg-1 {
+        border-right: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .weekday-col .col-md-1:last-child,
+    .weekday-col .col-sm-1:last-child,
+    .weekday-col .col-lg-1:last-child {
+        border-right: none;
+    }
+
+    .weekday-col {
+        margin-bottom: 20px;
+    }
+
+    .day-label {
+        width: 100%;
+        font-size: 18px;
+    }
+
+    .day-temp {
+        font-size: 22px;
+    }
+    .calendar-day > label {
+        width: 100%;
+    }
+    .calendar-day {
+        font-size: 14px;
+        font-weight: 700;
+        padding: 10px 0 10px 0;
+    }
+    .calendar-day > .col-md-12 > i {
+        font-size: 30px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .chart-icon {
+    color:#5BC0DE;
+    display:block;
+    /*line-height:145px;*/
+    text-align:center;
+        position: relative;
+        bottom: 95px;
+    /*width:153px;*/
+    font-size:50px;
+    font-weight:100;
+    /*margin-left:5px;*/
+}
+    .chart-canvas {
+    display: block;
+    top:0;
+        width: 100%;
+    /*left:0;*/
+}
+
+    
+    .sensor-label > h4 {
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+    .sensor-label > p {
+        font-size: 14px;
+    }
+
+    .sensor-details {
+          position: relative;
+          top: 50%;
+        transform: translateY(50%);
+        -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+        margin-bottom: 70px;
+    }
+
+    .sensor-details > .input-group {
+        margin-bottom: 5px;
+    }
+
+    .watering-status {
+        text-align: center;
+    }
+    .watering-status > h4 {
+          font-size: 20px;
+        font-weight: 800;
+        color: #707478;
+        width: 100%;
+    }
+    .watering-status > i {
+        font-size: 65px;
+        color: #707478;
+    }
+    .watering-status.active > i {
+        color: #428bca;
+    }
+
+    .watering-status.active > h4 {
+        color: black;
+    }
+    /*.watering-status.active {
+        color: #428bca;
+    }*/
+
+    .loading {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+</style>
+
+<div class="row" style="margin-top: 75px;">
+    @*<div class="col-md-12">
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")">Home</a></li>
+            <li><a href="@Url.Action("Dashboard", "Home")">Dashboard</a></li>
+        </ol>    
+    </div>*@
+    <div class="col-md-3 col-sm-6">
+        <div class="widget widget-stats btn-success">
+            <div class="stats-icon">
+                <i class="glyphicon glyphicon-leaf"></i>
+            </div>
+            <div class="stats-info">
+                <h4>SOIL MOISTURE LEVEL</h4>
+                <p>@string.Format("{0:N2} %", (Model.SensorDetails.Sum(x => x.MoistureLevel)/3))</p>
+            </div>
+            <div class="stats-link">
+                <a data-toggle="collapse" href="#viewSoilDetails">View Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div role="presentation" class="widget widget-stats btn-warning">
+            <div class="stats-icon">
+                <i class="fa fa-sun-o"></i>
+            </div>
+            <div class="stats-info">
+                <h4>CURRENT TEMPERATURE</h4>
+                <p>@(Model.TemperatureByDates.ContainsKey(now.Date) ? string.Format("{0}°F", Math.Floor(Model.TemperatureByDates[now.Date])) : "N/A")</p>
+            </div>
+            <div class="stats-link">
+                <a data-toggle="collapse" href="#viewTempDetails">View Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="widget widget-stats btn-info">
+            <div class="stats-icon"><i class="fa fa-tint"></i>
+            </div>
+            <div class="stats-info">
+                <h4>WATERING STATUS</h4>
+                <p id="wateringStatus">@(Model.IrrigationValves.SelectMany(x => x.WateringEvents).Any(x => x.Watering) ? "On" : "Off")</p>
+            </div>
+            <div class="stats-link">
+                <a data-toggle="collapse" href="#viewWateringDetails">View Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="widget widget-stats btn-primary">
+            <div class="stats-icon"><i class="fa fa-clock-o"></i>
+            </div>
+            <div class="stats-info">
+                <h4>NEXT SCHEDULED WATERING</h4>
+                <p>@Model.NextScheduledWatering</p>
+            </div>
+            <div class="stats-link">
+                <a data-toggle="collapse" href="#viewDetails" style="display: list-item; background: none"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="collapse moistureChart well" id="viewSoilDetails">
+    <div class="row">
+        @foreach (var sensorDetail in Model.SensorDetails) {
+            <div class="col-md-4">
+                <div class="col-md-6">
+                    <div class="chart soil-canvas" id="graph@(sensorDetail.SensorNumber)" data-percent="@sensorDetail.MoistureLevel"></div>
+                    <div class="col-md-12 sensor-label">
+                        <h4>Sensor @sensorDetail.SensorNumber</h4>
+                    </div>
+                </div>
+                <div class="col-md-6 sensor-details">
+                    <div class="input-group">
+                        <label class="control-label">
+                            Moisture Level
+                        </label>
+                        <div class="">
+                            @string.Format("{0}%", Math.Round(sensorDetail.MoistureLevel, 0))
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="control-label">
+                            Last Updated
+                        </label>
+                        <div class="">
+                            @sensorDetail.LastUpdated.ToString("g")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="collapse" id="viewTempDetails">
+    <div class="row weekday-col">
+        <div class="col-md-12">
+            @{
+                var previousWeek = ListHelper.GetPreviousWeekDates(now);
+            }
+            @foreach (var date in previousWeek) {
+                var temp = Model.TemperatureByDates.ContainsKey(date.Date) ? Model.TemperatureByDates[date.Date] : 999; // 999 signifies invalid temp
+                <div class="col-md-1 btn-warning calendar-day">
+                    <div class="col-md-12">@date.DayOfWeek</div>
+                    <div class="col-md-12" style="font-size: 12px">@date.Date.ToString("d")</div>
+                    <div class="col-md-12">
+                        @if (temp != 999) {
+                            if (temp > 80) {
+                                <i class="wi wi-day-sunny"></i>
+                            } else if (temp <= 80 && temp > 60) {
+                                <i class="wi wi-day-sunny-overcast"></i>
+                            } else if (temp <= 60 && temp > 34) {
+                                <i class="wi-cloudy-windy"></i>
+                            } else {
+                                <i class="wi-snowflake-cold"></i>
+                            }
+                        } else {
+                            <i class="fa fa-exclamation-triangle"></i>
+                        }
+                    </div>
+                    <div class="col-md-12">@(temp != 999 ? string.Format("{0}°F", Math.Floor(temp)) : "N/A")</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="collapse well" id="viewWateringDetails">
+    <div class="row">
+        @foreach (var valve in Model.IrrigationValves.Take(3)) {
+            var active = valve.WateringEvents.Any(x => x.Watering);
+            <div class="col-md-4 watering-status@(active ? " active" : "")">
+                <i class="fa fa-tint waterdrop"></i>
+                <h4>Valve @(valve.ValveNumber + 1)</h4>
+                @if (active) {
+                    <input class="watering-switch" data-valveid="@valve.Id" type="checkbox" name="my-checkbox" checked>
+                } else {
+                    <input class="watering-switch" data-valveid="@valve.Id" type="checkbox" name="my-checkbox">
+                }
+            </div>
+        }
+    </div>
+    
+</div>
+    
+<div class="row">
+    <div class="col-md-5">
+        <div class="panel" style="border: none">
+            <div class="panel-heading" style="background-color: #242a30; color: white">
+                <h3 class="panel-title" id="panel-title">Soil Moisture Report<a class="anchorjs-link" href="#panel-title"><span class="anchorjs-icon"></span></a></h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 style="margin-top: 0; margin-bottom: 0">Filter by</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="s2Init" id="soilReportFilter" style="width: 100%; margin-top: 10px; margin-bottom: 10px">
+                            <option value="@FilterType.Week">Past 7 days</option>
+                            <option value="@FilterType.Month">Past 30 days</option>
+                            <option value="@FilterType.Year">Current year</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 loading">
+                        <i id="loadingSpinner" class="fa fa-spinner fa-pulse" style="display: none; margin-left: -20px"></i>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="soilMoistureChart"></div>
+                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="panel" style="border: none">
+            <div class="panel-heading" style="background-color: #242a30; color: white">
+                <h3 class="panel-title" id="panel-title">Watering Schedule<a class="anchorjs-link" href="#panel-title"><span class="anchorjs-icon"></span></a></h3>
+            </div>
+            <div class="panel-body">
+                <div id='calendar'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div id="newEventModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">Schedule Watering</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="wateringEventForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Select Irrigation Valve(s)</label>
+                                @Html.DropDownList("IrrigationValveS2", new SelectList(ListHelper.GetListOfIrrigationValves(Model.Unit.Id).Select(x => new { x.Id, Name = "Valve " + (x.ValveNumber + 1) }), "Id", "Name"), null, new { @id = "irrigationValveS2", @class = "s2Init", @style = "width: 100%", @multiple = "multiple" })
+                            </div>
+                            <br />
+                            <div class="col-md-6">
+                                <label>Start Time</label>
+                            </div>
+                            <div class="col-md-6">
+                                <label>End Time</label>
+                            </div>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></span>
+                                @*@Html.TextBox("StartTime", new { @class = "form-control", @id = "startTime" })*@
+                                <input id="startTime" class="form-control"/>
+                            </div>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon" id="sizing-addon2"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></span>
+                                @*@Html.TextBox("EndTime", new { @class = "form-control", @id = "endTime" })*@
+                                <input id="endTime" class="form-control" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="createEvent" type="button" class="btn btn-primary">Create event</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.watering-switch').bootstrapSwitch();
+
+        $('.watering-switch').on('switchChange.bootstrapSwitch', function (event, state) {
+            var valveId = $(this).data('valveid');
+            var waterSwitch = $(this);
+            waterSwitch.closest('.watering-status').toggleClass('active');
+
+            waterSwitch.bootstrapSwitch("toggleDisabled");
+            $.ajax({
+                url: '@Url.Action("SetWateringEventAction", "Home")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    valveId: valveId,
+                    status: state
+                },
+                success: function (data) {
+                    if (data.error) {
+                        toastr.error(data.msg, 'Error!');
+                        waterSwitch.bootstrapSwitch("toggleState");
+                    } else {
+                        toastr.success(data.msg, 'Success!');
+                        if (data.jsonEvent) {
+                            $('#calendar').fullCalendar('renderEvent', data.jsonEvent, true);
+                        }
+                    }
+                    waterSwitch.bootstrapSwitch("toggleDisabled");
+                    $('#wateringStatus').html(data.watering ? "On" : "Off");
+                }
+            });
+        });
+
+        var selectedDate;
+        $('.s2Init').select2();
+            
+        $('#startTime, #endTime').datetimepicker({
+            format: 'LT'
+        });
+
+        var soilMoistureChart = Morris.Area({
+            element: 'soilMoistureChart',
+            data: [],
+            xkey: 'd',
+            ykeys: ['max', 'min'],
+            labels: ['Max Moisture', 'Min Moisture'],
+            fillOpacity: 0.6,
+            xLabelFormat: function (x) {
+                return $('#soilReportFilter').val() == "Year" ? moment(x).format("MMM") : moment(x).format("MMM D");
+            },
+            dateFormat: function(x) {
+                return $('#soilReportFilter').val() == "Year" ? moment(x).format("MMMM YYYY") : moment(x).format("dddd, MMMM Do YYYY");
+            },
+            yLabelFormat: function(y) { return y + "%"; },
+            hideHover: 'auto',
+            behaveLikeLine: true,
+            resize: true,
+        });
+        
+        $('#soilReportFilter').on('change', function (v) {
+            $('#loadingSpinner').show();
+            $.ajax({
+                url: "@Url.Action("GenerateSoilMoistureGraph", "Home")",
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    filterBy: $(this).val()  
+                },
+                success: function (data) {
+                    $('#loadingSpinner').hide();
+                    soilMoistureChart.setData(data.results);
+                }
+            });
+        }).trigger('change');
+
+        for (var i = 0; i < 3; i++) {
+            var graph = 'graph' + (i + 1);
+            var percentage = $('#' + graph).data('percent');
+            var options = {
+                percent: percentage == 0 ? 0.1 : percentage,
+                size: 150,
+                lineWidth: 25,
+                rotate: 0
+            }
+
+            var el = document.getElementById('graph' + (i + 1));
+            var canvas = document.createElement('canvas');
+            canvas.className = "chart-canvas";
+            var span = document.createElement('span');
+            span.className = "fa fa-tint chart-icon";
+
+            var ctx = canvas.getContext('2d');
+            canvas.width = canvas.height = options.size;
+            el.appendChild(canvas);
+            el.appendChild(span);
+
+            ctx.translate(options.size / 2, options.size / 2); // change center
+            ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI); // rotate -90 deg
+
+            var radius = (options.size - options.lineWidth) / 2;
+
+            var drawCircle = function (color, lineWidth, percent) {
+                percent = Math.min(Math.max(0, percent || 1), 1);
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, Math.PI * 2 * percent, false);
+                ctx.strokeStyle = color;
+                ctx.lineCap = 'butt'; // butt, round or square
+                ctx.lineWidth = lineWidth;
+                ctx.stroke();
+            };
+
+            drawCircle('#D9E0E7', options.lineWidth, 100 / 100);
+            drawCircle('#5bc0de', options.lineWidth, options.percent / 100);
+        }
+
+        $('#calendar').fullCalendar({
+            lang: 'en',
+            selectable: true,
+            selectHelper: true,
+           // editable: true,
+            eventLimit: 4,
+            dayClick: function (date, jsEvent, view) {
+                var check = $.fullCalendar.formatDate(date, 'yyyy-MM-dd');
+                var today = $.fullCalendar.formatDate(new Date(), 'yyyy-MM-dd');
+                if (check < today) {
+                    return;
+                }
+
+                selectedDate = date.toISOString();
+                $('#newEventModal').modal('show');
+            },
+            eventClick: function (calEvent, jsEvent, view) {
+                var check = $.fullCalendar.formatDate(calEvent.start, 'yyyy-MM-dd');
+                var today = $.fullCalendar.formatDate(new Date(), 'yyyy-MM-dd');
+                
+                if (check < today) {
+                    console.log("invalid date");
+                    return;
+                }
+                var resp = confirm("Are you sure you wish to remove this event?");
+                var eventId = calEvent.id;
+                if (resp == true) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteWateringEvent", "Home")',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: eventId
+                        },
+                        success: function(data) {
+                            $('#calendar').fullCalendar('removeEvents', [eventId]);
+                            toastr.success(data.msg, 'Success!');
+                        }
+                    });
+                }
+            },
+            eventRender: function (event, element) {
+                $(element).tooltip({ title: 'Valve ' + event.valve, placement: 'right', container: 'body' });
+            }
+        });
+
+        $.ajax({
+            url: "@Url.Action("GetWateringEvents", "Home")",
+            type: 'GET',
+            success: function (data) {
+                for (var i = 0; i < data.eventData.length; i++) {
+                    $('#calendar').fullCalendar('renderEvent', data.eventData[i], true);
+                }
+            }
+        });
+
+        $('#newEventModal').on('hide.bs.modal', function (e) {
+            $('#calendar').fullCalendar('unselect');
+        });
+
+        $('#createEvent').on('click', function () {
+            $.ajax({
+                url: "@Url.Action("CreateWateringEvent", "Home")",
+                data: {
+                    irrigationValveIds: $('#irrigationValveS2').val(),
+                    selectedDate: selectedDate,
+                    startTime: $('#startTime').val(),
+                    endTime: $('#endTime').val()
+                },
+                traditional: true,
+                type: 'POST',
+                success: function (data) {
+                    for (var i = 0; i < data.eventData.length; i++) {
+                        $('#calendar').fullCalendar('renderEvent', data.eventData[i], true);
+                    }
+                    $('#newEventModal').modal('hide');
+                }
+            });
+        });
+    });
+</script>
+
