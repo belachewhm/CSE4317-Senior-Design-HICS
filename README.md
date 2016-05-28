@@ -21,3 +21,17 @@ control unit allows users to remotely schedule or monitor their lawns by communi
 with the HICS web application over the Internet. Through the web application, users 
 will be granted complete access to all the features that HICS offers while providing 
 an intuitive and easy to use interface.
+
+## Contributors
+- Belachew Haile-Mariam
+	[(GitHub)](www.github.com)
+	[(LinkedIn)](www.linkedin.com)
+- Jeremiah O'Connor
+	[(GitHub)](www.github.com)
+	[(LinkedIn)](www.linkedin.com)
+- Gautam Adhikari
+	[(GitHub)](www.github.com)
+	[(LinkedIn)](www.linkedin.com)
+- Tung Vo
+	[(GitHub)](www.github.com)
+	[(LinkedIn)](www.linkedin.com)
