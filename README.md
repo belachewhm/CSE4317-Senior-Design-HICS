@@ -27,11 +27,11 @@ an intuitive and easy to use interface.
 	[(GitHub)](https://github.com/belachewhm)
 	[(LinkedIn)](https://www.linkedin.com/in/belachew-haile-mariam-02259165)
 - Jeremiah O'Connor
-	[(GitHub)](www.github.com)
+	[(GitHub)](https://github.com/)
 	[(LinkedIn)](https://www.linkedin.com/in/jeremiah-o-connor-8b243493)
 - Gautam Adhikari
-	[(GitHub)](www.github.com)
+	[(GitHub)](https://github.com/)
 	[(LinkedIn)](https://www.linkedin.com/in/gautam-adhikari-3ab1566b)
 - Tung Vo
-	[(GitHub)](www.github.com)
+	[(GitHub)](https://github.com/)
 	[(LinkedIn)](https://www.linkedin.com/in/timothy-vo-1601a6b9)
