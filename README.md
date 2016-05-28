@@ -24,14 +24,14 @@ an intuitive and easy to use interface.
 
 ## Contributors
 - Belachew Haile-Mariam
-	[(GitHub)](www.github.com)
-	[(LinkedIn)](www.linkedin.com)
+	[(GitHub)](https://github.com/belachewhm)
+	[(LinkedIn)](https://www.linkedin.com/in/belachew-haile-mariam-02259165)
 - Jeremiah O'Connor
 	[(GitHub)](www.github.com)
-	[(LinkedIn)](www.linkedin.com)
+	[(LinkedIn)](https://www.linkedin.com/in/jeremiah-o-connor-8b243493)
 - Gautam Adhikari
 	[(GitHub)](www.github.com)
-	[(LinkedIn)](www.linkedin.com)
+	[(LinkedIn)](https://www.linkedin.com/in/gautam-adhikari-3ab1566b)
 - Tung Vo
 	[(GitHub)](www.github.com)
-	[(LinkedIn)](www.linkedin.com)
+	[(LinkedIn)](https://www.linkedin.com/in/timothy-vo-1601a6b9)
